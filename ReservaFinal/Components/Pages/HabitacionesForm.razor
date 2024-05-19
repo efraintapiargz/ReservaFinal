@@ -1,0 +1,71 @@
+﻿@page "/habitaciones/nueva"
+@page "/habitaciones/editar/{Id:int}"
+
+@inject NavigationManager _navigator;
+@inject IRepositorioHabitaciones _repositorioHabitaciones;
+
+<h2>@_mensaje Habitación</h2>
+
+<EditForm Model="_habitacion" FormName="formHabitaciones" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label>Tipo de Habitación</label>
+        <InputText class="form-control" @bind-Value="_habitacion.TipoHabitacion" />
+        <ValidationMessage For="@(() => _habitacion.TipoHabitacion)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Estado</label>
+        <InputText class="form-control" @bind-Value="_habitacion.Estado" />
+        <ValidationMessage For="@(() => _habitacion.Estado)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Precio por Noche</label>
+        <InputNumber class="form-control" @bind-Value="_habitacion.PrecioNoche" />
+        <ValidationMessage For="@(() => _habitacion.PrecioNoche)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-danger ms-3" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private string _mensaje = "";
+    private Habitacion _habitacion = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            _habitacion = await _repositorioHabitaciones.Get(Id);
+            _mensaje = "Modificar";
+        }
+        else
+        {
+            _mensaje = "Nueva";
+        }
+    }
+
+    private async void Guardar()
+    {
+        if (Id > 0)
+        {
+            await _repositorioHabitaciones.Update(Id, _habitacion);
+        }
+        else
+        {
+            await _repositorioHabitaciones.Add(_habitacion);
+        }
+        Cancelar();
+    }
+
+    private void Cancelar()
+    {
+        _navigator.NavigateTo("/habitaciones");
+    }
+}

@@ -1,0 +1,104 @@
+﻿@page "/reservas/nueva"
+@page "/reservas/editar/{Id:int}"
+
+@inject NavigationManager _navigator;
+@inject IRepositorioReservas _repositorioReservas;
+@inject IRepositorioClientes _repositorioClientes;
+
+<h2>@_mensaje Reserva</h2>
+
+<EditForm Model="_reserva" FormName="formReserva" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label>Cliente</label>
+        <InputSelect class="form-control" @bind-Value="_reserva.ClienteId">
+            <option value="0">Seleccione un cliente</option>
+            @foreach (var cliente in _clientes)
+            {
+                <option value="@cliente.ClienteId">@cliente.Nombre</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => _reserva.ClienteId)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Reserva</label>
+        <InputDate class="form-control" @bind-Value="_reserva.FechaReserva" />
+        <ValidationMessage For="@(() => _reserva.FechaReserva)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Entrada</label>
+        <InputDate class="form-control" @bind-Value="_reserva.FechaEntrada" />
+        <ValidationMessage For="@(() => _reserva.FechaEntrada)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Salida</label>
+        <InputDate class="form-control" @bind-Value="_reserva.FechaSalida" />
+        <ValidationMessage For="@(() => _reserva.FechaSalida)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Número de Habitaciones</label>
+        <InputNumber class="form-control" @bind-Value="_reserva.NumeroHabitaciones" />
+        <ValidationMessage For="@(() => _reserva.NumeroHabitaciones)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Estado</label>
+        <InputSelect class="form-control" @bind-Value="_reserva.Estado">
+            <option value="@EstadoReserva.Pendiente">Pendiente</option>
+            <option value="@EstadoReserva.Confirmada">Confirmada</option>
+            <option value="@EstadoReserva.Cancelada">Cancelada</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => _reserva.Estado)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-danger ms-3" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private string _mensaje = "";
+    private Reserva _reserva = new();
+    private List<Cliente> _clientes = new List<Cliente>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _clientes = await _repositorioClientes.GetAll();
+
+        if (Id > 0)
+        {
+            _reserva = await _repositorioReservas.Get(Id);
+            _mensaje = "Modificar";
+        }
+        else
+        {
+            _mensaje = "Nueva";
+            _reserva.Estado = EstadoReserva.Pendiente; // Establecer el estado predeterminado para nuevas reservas
+        }
+    }
+
+    private async void Guardar()
+    {
+        if (Id > 0)
+        {
+            await _repositorioReservas.Update(Id, _reserva);
+        }
+        else
+        {
+            await _repositorioReservas.Add(_reserva);
+        }
+        Cancelar();
+    }
+
+    private void Cancelar()
+    {
+        _navigator.NavigateTo("/reservas");
+    }
+}
