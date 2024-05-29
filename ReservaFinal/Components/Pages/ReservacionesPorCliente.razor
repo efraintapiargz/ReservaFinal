@@ -1,0 +1,49 @@
+﻿@page "/reservas/cliente/{ClienteId:int}"
+@rendermode InteractiveServer
+@inject IRepositorioReservas _repositorio;
+
+<h3>Reservaciones del Cliente</h3>
+
+@if (_reservas == null)
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+}
+else if (_reservas.Count == 0)
+{
+    <h3>No existen reservaciones para este cliente</h3>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha de Entrada</th>
+                <th>Fecha de Salida</th>
+                <th>Habitación</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Reserva reserva in _reservas)
+            {
+                <tr>
+                    <td>@reserva.FechaEntrada.ToShortDateString()</td>
+                    <td>@reserva.FechaSalida.ToShortDateString()</td>
+                    <td>@reserva.Habitacion!.TipoHabitacion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    private List<Reserva>? _reservas;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _reservas = await _repositorio.GetReservasPorCliente(ClienteId);
+    }
+}

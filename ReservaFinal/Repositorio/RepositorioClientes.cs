@@ -36,12 +36,12 @@ namespace ReservaFinal.Repositorio
 
         public async Task<List<Cliente>> GetAll()
         {
-            return await _context.Clientes.ToListAsync();
+            return await _context.Clientes.ToListAsync();   
         }
 
         public async Task Update(int id, Cliente cliente)
         {
-            var personaactual = await _context.Clientes.FindAsync(cliente);
+            var personaactual = await _context.Clientes.FindAsync(id);
             if (personaactual != null)
             {
                 personaactual.Nombre = cliente.Nombre;

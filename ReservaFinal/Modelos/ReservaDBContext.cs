@@ -18,6 +18,11 @@ namespace ReservaFinal.Modelos
                 .HasOne(r => r.Cliente)
                 .WithMany()
                 .HasForeignKey(r => r.ClienteId);
+
+            modelBuilder.Entity<Reserva>()
+                .HasOne(r => r.Habitacion)
+                .WithMany()
+                .HasForeignKey(r => r.HabitacionId);
         }
     }
 }

@@ -1,32 +1,33 @@
 ﻿@page "/habitaciones/nueva"
 @page "/habitaciones/editar/{Id:int}"
-
+@rendermode InteractiveServer
 @inject NavigationManager _navigator;
-@inject IRepositorioHabitaciones _repositorioHabitaciones;
+@inject IRepositorioHabitaciones _repositorio;
 
-<h2>@_mensaje Habitación</h2>
-
-<EditForm Model="_habitacion" FormName="formHabitaciones" OnValidSubmit="Guardar">
+<h2>@_mensaje Habitacion</h2>
+<EditForm Model="_habitacion" FormName="frmHabitacion" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
-
-    <div class="mb-3">
-        <label>Tipo de Habitación</label>
-        <InputText class="form-control" @bind-Value="_habitacion.TipoHabitacion" />
-        <ValidationMessage For="@(() => _habitacion.TipoHabitacion)" />
+    <div class="row mb-3">
+        <label for="txtTipoHabitacion" class="col-2 col-form-label">Tipo de Habitacion (Estandar/Suite/Master)</label>
+        <div class="col-10">
+            <InputText id="txtTipoHabitacion" class="form-control" @bind-Value="_habitacion.TipoHabitacion" />
+            <ValidationMessage For="()=>_habitacion.TipoHabitacion" />
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label>Estado</label>
-        <InputText class="form-control" @bind-Value="_habitacion.Estado" />
-        <ValidationMessage For="@(() => _habitacion.Estado)" />
+    <div class="row mb-3">
+        <label for="txtEstado" class="col-2 col-form-label">Estado (Disponible/Ocupado/Mantenimiento)</label>
+        <div class="col-10">
+            <InputText id="txtEstado" class="form-control" @bind-Value="_habitacion.Estado" />
+            <ValidationMessage For="()=>_habitacion.Estado" />
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label>Precio por Noche</label>
-        <InputNumber class="form-control" @bind-Value="_habitacion.PrecioNoche" />
-        <ValidationMessage For="@(() => _habitacion.PrecioNoche)" />
+    <div class="row mb-3">
+        <label for="txtPrecioNoche" class="col-2 col-form-label">Precio por noche</label>
+        <div class="col-10">
+            <InputNumber id="txtPrecioNoche" class="form-control" @bind-Value="_habitacion.PrecioNoche" />
+            <ValidationMessage For="()=>_habitacion.PrecioNoche" />
+        </div>
     </div>
-
     <button type="submit" class="btn btn-primary">Guardar</button>
     <button class="btn btn-danger ms-3" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
 </EditForm>
@@ -34,15 +35,14 @@
 @code {
     [Parameter]
     public int Id { get; set; }
-
     private string _mensaje = "";
-    private Habitacion _habitacion = new();
+    private Habitacion? _habitacion = new();
 
     protected override async Task OnInitializedAsync()
     {
         if (Id > 0)
         {
-            _habitacion = await _repositorioHabitaciones.Get(Id);
+            _habitacion = await _repositorio.Get(Id);
             _mensaje = "Modificar";
         }
         else
@@ -55,11 +55,11 @@
     {
         if (Id > 0)
         {
-            await _repositorioHabitaciones.Update(Id, _habitacion);
+            await _repositorio.Update(Id, _habitacion!);
         }
         else
         {
-            await _repositorioHabitaciones.Add(_habitacion);
+            await _repositorio.Add(_habitacion!);
         }
         Cancelar();
     }

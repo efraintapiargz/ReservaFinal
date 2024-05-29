@@ -1,38 +1,24 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReservaFinal.Modelos
 {
-    public enum EstadoReserva
-    {
-        Pendiente,
-        Confirmada,
-        Cancelada
-    }
     public class Reserva
     {
-        [Key]
         public int ReservaId { get; set; }
 
-        [ForeignKey("Cliente")]
+        [Required(ErrorMessage = "Debe seleccionar un cliente")]
         public int ClienteId { get; set; }
-        public Cliente Cliente { get; set; } // Propiedad de navegación
+        public Cliente? Cliente { get; set; }
 
-        [Required]
-        public DateTime FechaReserva { get; set; }
+        [Required(ErrorMessage = "Debe seleccionar una habitación")]
+        public int HabitacionId { get; set; }
+        public Habitacion? Habitacion { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de entrada es requerida")]
         public DateTime FechaEntrada { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de salida es requerida")]
         public DateTime FechaSalida { get; set; }
-
-        [Required]
-        public int NumeroHabitaciones { get; set; }
-
-        [Required]
-        public EstadoReserva Estado { get; set; }
-
     }
 }
